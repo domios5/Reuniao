@@ -31,6 +31,9 @@ function startCall(){
         audio: true
     }, (stream) =>{
         document.getElementById("local-video").srcObject = localStream
+
+
+        
     }, (error)=> {
         console.log(error)
     
