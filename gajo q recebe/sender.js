@@ -96,3 +96,18 @@ function createAndSendOffer(){
         console.log(error)
     })
 }
+
+
+let isAudio = true
+funcion muteAudio() {
+    isAudio = !isAudio
+
+    localStream.getAudioTracks()[0].enable = isAudio
+
+}
+
+let isVideo = true
+funcion muteVideo() {
+    isVideo=!isVideo
+    localStream.getVideoTracks()[0].enable = isVideo
+}
