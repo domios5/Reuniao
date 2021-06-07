@@ -6,13 +6,28 @@ webSocket.onmessage = (event) => {
 
 function handleSignallingData(data){
     switch ( data.type){
-        case"answer":
-            peerConn.setRemoteDescription(data.answer)
+        case"offer":
+            peerConn.setRemoteDescription(data.offer)
+            createAndSendAnswer()
             break
         case"candidate":
             peerConn.addIceCandidate(data.candidate)
     }
 }
+
+funcion createAndSendAnswer(){
+    peerConn.createAnswer((answer) => {
+        peerConn.setLocalDescription(answer)
+        sendData({
+            type: "send_answer",
+            answer; answer
+        })
+    }, error =>{
+        console.log(error)
+    })
+}
+
+
 
 function sendData(data){
     data.username = username
@@ -68,6 +83,9 @@ function joinCall(){
             })    
         })
 
+        sendData({
+            type: "join_call"
+        })
 
     }, (error)=> {
         console.log(error)
