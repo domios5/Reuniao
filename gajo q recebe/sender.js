@@ -41,7 +41,7 @@ function startCall(){
             width: {
             min:480, indeal:720, max:1280
             },
-            aspectRatio: 1.333333
+            aspectRatio: 1.33333
         },
         audio: true
     }, (stream) =>{
