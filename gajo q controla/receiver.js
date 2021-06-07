@@ -22,7 +22,7 @@ funcion createAndSendAnswer(){
             type: "send_answer",
             answer; answer
         })
-    }, error =>{
+    }, error => {
         console.log(error)
     })
 }
