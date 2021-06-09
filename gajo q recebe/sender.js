@@ -1,113 +1,107 @@
 const webSocket = new WebSocket("ws://Localhost:5500")
 
-webSocket.onmessage = (event) =>{
+webSocket.onmessage = (event) => {
     handleSignallingData(JSON.parse(event.data))
 }
 
-function handleSignallingData(data){
-    switch ( data.type){
-        case"answer":
+function handleSignallingData(data) {
+    switch (data.type) {
+        case "answer":
             peerConn.setRemoteDescription(data.answer)
             break
-        case"candidate":
+        case "candidate":
             peerConn.addIceCandidate(data.candidate)
     }
 }
 
 let username
-function sendUsername(){
+function sendUsername() {
 
-    username = document.getElementById("usernem-input").nodeValue
+    username = document.getElementById("username-input").value
     sendData({
-        type:"store_user"
+        type: "store_user"
     })
-
 }
 
-function sendData(data){
+function sendData(data) {
     data.username = username
     webSocket.send(JSON.stringify(data))
 }
 
+
 let localStream
 let peerConn
-function startCall(){
+function startCall() {
     document.getElementById("video-call-div")
     .style.display = "inline"
 
     navigator.getUserMedia({
-        video:{
+        video: {
             frameRate: 24,
             width: {
-            min:480, indeal:720, max:1280
+                min: 480, ideal: 720, max: 1280
             },
             aspectRatio: 1.33333
         },
         audio: true
-    }, (stream) =>{
+    }, (stream) => {
+        localStream = stream
         document.getElementById("local-video").srcObject = localStream
 
         let configuration = {
-            iceServers:[
-                 {
-                     "urls":["stun.l.google.com:19302",
-                     "stun1.l.google.com:19302",
-                     "stun2.l.google.com:19302"]
-                 }
-
+            iceServers: [
+                {
+                    "urls": ["stun:stun.l.google.com:19302", 
+                    "stun:stun1.l.google.com:19302", 
+                    "stun:stun2.l.google.com:19302"]
+                }
             ]
         }
 
         peerConn = new RTCPeerConnection(configuration)
         peerConn.addStream(localStream)
 
-        peerConn.onaddstream = (e) =>{
-            document.getElementById("remote-video").srcObject = e.stream
+        peerConn.onaddstream = (e) => {
+            document.getElementById("remote-video")
+            .srcObject = e.stream
         }
 
-        peerConn.onicecandidate = ((e) =>{
+        peerConn.onicecandidate = ((e) => {
             if (e.candidate == null)
                 return
             sendData({
-                type:"store_candidate",
+                type: "store_candidate",
                 candidate: e.candidate
-            })    
+            })
         })
 
-
-
         createAndSendOffer()
-    }, (error)=> {
+    }, (error) => {
         console.log(error)
-    
     })
-
 }
 
-function createAndSendOffer(){
-    peerConn.createOffer((offer) =>{
+function createAndSendOffer() {
+    peerConn.createOffer((offer) => {
         sendData({
-            type:"store_offer",
+            type: "store_offer",
             offer: offer
         })
 
         peerConn.setLocalDescription(offer)
-    }, (error) =>{
+    }, (error) => {
         console.log(error)
     })
 }
 
-
 let isAudio = true
-funcion muteAudio() {
+function muteAudio() {
     isAudio = !isAudio
-
-    localStream.getAudioTracks()[0].enable = isAudio
-
+    localStream.getAudioTracks()[0].enabled = isAudio
 }
 
 let isVideo = true
-funcion muteVideo() {
-    isVideo=!isVideo
-    localStream.getVideoTracks()[0].enable = isVideo
+function muteVideo() {
+    isVideo = !isVideo
+    localStream.getVideoTracks()[0].enabled = isVideo
 }
